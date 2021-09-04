@@ -1,0 +1,10 @@
+{
+    "theme_version":1,
+    "theme":{
+        "black":"#333333",
+        "white":"#ffffff",
+        "case_size":75, 
+        "hightlight_color":"#70a1ff",
+        "hightlight_alpha":0.7
+    }
+}
