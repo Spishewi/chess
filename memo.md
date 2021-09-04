@@ -12,3 +12,6 @@ socket :
         ord(msg[0])
 
         
+
+
+Avec louan, on à débuggé le roque, il fonctionne, il faut vérifier pourquoi les vérifications des attaques des pions ne se font pas correctement, et vérifier uen dernière fois piur les autres pièces. 

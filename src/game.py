@@ -51,8 +51,10 @@ class ChessBase:
                 self.pawn_mv2 = (int(coords[2]), int(coords[3]))
             else:
                 self.pawn_mv2 = None
+
             self.ismyturn = True
             self.parent.master.title("Your turn")
+
         elif message.startswith("rm"): #handle spécials deaths
             coords = message[2:].split(";")
             self.handle_death(int(coords[0]), int(coords[1]))
@@ -226,8 +228,8 @@ class ChessBase:
     
     def check_move(self, oldx, oldy, newx, newy, for_casteling=False):
         chessman = self.chessboard_positions[oldx][oldy][0]
-        print(chessman)
-        print(self.pawn_mv2)
+        #print(chessman)
+        #print(self.pawn_mv2)
         if chessman.endswith("rook"):
             if oldx == newx:
                 if oldy < newy:
@@ -354,7 +356,7 @@ class ChessBase:
                 if oldy-newy == 1:
                     if abs(oldx-newx) == 1:
                         if self.chessboard_positions[newx][newy] != None:
-                            if self.chessboard_positions[newx][newy][0].startswith("black"):
+                            if (self.chessboard_positions[newx][newy][0].startswith("black")):
                                 return True
                         elif oldy == 3 and oldx-newx == -1 and self.chessboard_positions[newx][newy+1] != None and self.pawn_mv2 != None:
                             if newx == self.pawn_mv2[0] and newy == self.pawn_mv2[1]-1:
@@ -371,12 +373,16 @@ class ChessBase:
                             return True
                 elif oldy-newy == 2 and oldx-newx == 0 and oldy == 6 and self.chessboard_positions[newx][5] == None and self.chessboard_positions[newx][4] == None:
                     return True
-                       
+
+                elif oldy-newy == -1 and for_casteling:
+                    if abs(oldx-newx) == 1:
+                        return True
+
             else:
                 if oldy-newy == -1:
                     if abs(oldx-newx) == 1:
                         if self.chessboard_positions[newx][newy] != None:
-                            if self.chessboard_positions[newx][newy][0].startswith("white"):
+                            if (self.chessboard_positions[newx][newy][0].startswith("white")):
                                 return True
                         elif oldy == 4 and oldx-newx == -1 and self.chessboard_positions[newx][newy-1] != None and self.pawn_mv2 != None:
                             if newx == self.pawn_mv2[0] and newy == self.pawn_mv2[1]+1:
@@ -393,6 +399,9 @@ class ChessBase:
                             return True
                 elif oldy-newy == -2 and oldx-newx == 0 and oldy == 1 and self.chessboard_positions[newx][2] == None and self.chessboard_positions[newx][3] == None:
                     return True
+                elif oldy-newy == 1 and for_casteling:
+                    if abs(oldx-newx) == 1:
+                        return True
                 
             
             return False
@@ -453,6 +462,16 @@ class ChessBase:
             print("get enemy list")
             """
             #print(json.dumps(self.chessboard_positions, indent=4, separators=(", ", ": "), sort_keys=True))
+
+
+            #verifier si les cases sont libres
+            for case_to_check in cases_to_check:
+                if case_to_check != cases_to_check[0] and case_to_check != cases_to_check[-1]:
+                    if self.chessboard_positions[case_to_check[0]][case_to_check[1]] != None:
+                        return False
+            print("verif cases vides")
+
+
             enemy_pos_list = []
             for y in self.chessboard_positions:
                 for x in y:
@@ -465,29 +484,31 @@ class ChessBase:
                                 enemy_pos_list.append((self.chessboard_positions.index(y), y.index(x), ))
             print(enemy_pos_list)
             
-            #verifier si les cases sont libres
-            for case_to_check in cases_to_check:
-                if case_to_check != cases_to_check[0] and case_to_check != cases_to_check[-1]:
-                    if self.chessboard_positions[case_to_check[0]][case_to_check[1]] != None:
-                        return False
-            print("verif cases vides")
+            
 
             #verifier si il y a des enemy
             for case_to_check in cases_to_check:
-                print(enemy_pos_list)
+                #print(enemy_pos_list)
                 for enemy in enemy_pos_list:
-                    print(enemy[0], enemy[1], case_to_check[0], case_to_check[1])
+                    #print(enemy[0], enemy[1], case_to_check[0], case_to_check[1])
                     if self.check_move(enemy[0], enemy[1], case_to_check[0], case_to_check[1], for_casteling=True):
                         return False
             print("réussi")
+            print(rook_pos[0], rook_pos[1], oldx, oldy, newx, newy)
             self.castling(rook_pos[0], rook_pos[1], oldx, oldy, newx, newy) #tout les roques ne vont pas fonctionner, corriger ça 
                                                                             #(la tour vas pas tj là ou il u avais le roi)
-            self.socksend(f"ca{rook_pos[0]};{rook_pos[1]};{oldx};{oldy}")
+            if rook_pos[0] == 0:
+                self.socksend(f"ca{rook_pos[0]};{rook_pos[1]};{oldx-1};{oldy}")
+            else:
+                self.socksend(f"ca{rook_pos[0]};{rook_pos[1]};{oldx+1};{oldy}")
             return True
         return False
     def castling(self, rookx, rooky, kingx, kingy, newkingx, newkingy):
-        self.deplace(kingx, kingy, newkingx, newkingy)
-        self.deplace(rookx, rooky, kingx, kingy)
+        #self.deplace(kingx, kingy, newkingx, newkingy)
+        if rookx == 0:
+            self.deplace(rookx, rooky, kingx-1, kingy)
+        else:
+            self.deplace(rookx, rooky, kingx+1, kingy)
         
 
             

@@ -1,3 +1,4 @@
 unused/*
 src/test.json
 __pycache__
+*.exe

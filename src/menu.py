@@ -27,9 +27,12 @@ class Menu(tk.Frame):
         self.master.geometry("200x145")
 
         self.host_entry_label = ttk.Label(self.master_canvas, text="enter here the host IP :")
+        
         self.host_entry = ttk.Entry(self.master_canvas)
+        self.host_entry.insert(0, "127.0.0.1")
         self.port_entry_label = ttk.Label(self.master_canvas, text="enter here the port :")
         self.port_entry = ttk.Entry(self.master_canvas)
+        self.port_entry.insert(0, "5566")
         self.connect_button = ttk.Button(self.master_canvas, text="Connect", command=self.connect)
         self.quit_button = ttk.Button(self.master_canvas, text="quit", command=self.close)
 
